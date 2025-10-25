@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  cashbarber-sync:
+    build: .
+    container_name: cashbarber-sync
+    ports:
+      - "8881:8881"
+    environment:
+      # Cashbarber credentials
+      - CASHBARBER_EMAIL=${CASHBARBER_EMAIL}
+      - CASHBARBER_PASSWORD=${CASHBARBER_PASSWORD}
+      
+      # Supabase credentials
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      
+      # Tabela e colunas
+      - SUPABASE_TABLE_NAME=${SUPABASE_TABLE_NAME}
+      - COLUMN_NOME=${COLUMN_NOME}
+      - COLUMN_PLANO=${COLUMN_PLANO}
+      - COLUMN_STATUS=${COLUMN_STATUS}
+      - COLUMN_TIMESTAMP=${COLUMN_TIMESTAMP}
+      
+      # ChromeDriver
+      - CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
+    
+    # Para executar em modo interativo (teste)
+    # command: python main.py --email ${CASHBARBER_EMAIL} --password ${CASHBARBER_PASSWORD} --dry-run
+    
+    # Para executar sincronização real
+    command: python main.py --email ${CASHBARBER_EMAIL} --password ${CASHBARBER_PASSWORD}
+    
+    # Recursos
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1'
+    
+    # Restart policy para uso em cron
+    restart: "no"
+    
+    # Logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
